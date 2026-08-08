@@ -390,6 +390,9 @@ class ProjectConfig(SharedConfig):
         Create a ProjectConfig instance from a (full) configuration dictionary
         """
         lang_name_mapping = {"javascript": "typescript"}
+        if "languages" not in data and "language_servers" in data:
+            data["languages"] = data["language_servers"]
+
         languages: list[Language] = []
         for language_str in data["languages"]:
             orig_language_str = language_str
