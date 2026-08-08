@@ -145,24 +145,25 @@ class TestProjectConfig:
         assert is_complete, "Project template YAML is incomplete; all fields must be present (with descriptions)."
 
     @pytest.mark.parametrize(
-        "language_fields",
+        ("language_fields", "expected_language"),
         [
-            pytest.param({"languages": ["python"]}, id="legacy"),
-            pytest.param({"language_servers": ["python"]}, id="current"),
+            pytest.param({"languages": ["python"]}, Language.PYTHON, id="legacy"),
+            pytest.param({"language_servers": ["go"]}, Language.GO, id="current"),
             pytest.param(
                 {"languages": ["python"], "language_servers": ["go"]},
+                Language.PYTHON,
                 id="legacy-authoritative",
             ),
         ],
     )
-    def test_project_language_schema_compatibility(self, language_fields):
+    def test_project_language_schema_compatibility(self, language_fields, expected_language):
         data, _ = ProjectConfig._load_yaml_dict(PROJECT_TEMPLATE_FILE)
         data.pop("languages")
         data.update(language_fields)
 
         config = ProjectConfig._from_dict(data)
 
-        assert config.languages == [Language.PYTHON]
+        assert config.languages == [expected_language]
 
 
 class TestProjectConfigLanguageBackend:
